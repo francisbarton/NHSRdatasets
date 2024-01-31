@@ -5,15 +5,18 @@
 \alias{covid19}
 \title{International COVID-19 reported infection and death data}
 \format{
-Tibble with seven columns
+A tibble with 61900 rows and 7 columns
 \describe{
-\item{date_reported}{The date cases were reported}
-\item{contient}{A `factor` for the geographical continent in which the reporting country is located.}
-\item{countries_and_territories}{A `factor` for the country or territory reporting the data.}
-\item{countries_territory_code}{A `factor` for the a three-letter country or territory code.}
-\item{population_2019}{The reported population of the country for 2019, taken from Eurostat for Europe and the World Bank for the rest of the world.}
-\item{cases}{The reported number of positive cases.}
-\item{deaths}{The reported number of deaths.}
+\item{date_reported}{date. The date cases were reported.}
+\item{continent}{chr. The geographical continent in which the reporting
+ country or territory is located.}
+\item{country_territory}{chr. The country or territory reporting the data.}
+\item{country_territory_code}{chr. The three-letter country/territory code.}
+\item{population}{numeric. The reported 2019 population of the country
+ or territory, taken from Eurostat (for Europe) or the World Bank (for the
+ rest of the world).}
+\item{cases}{numeric. The reported number of Covid-19 cases.}
+\item{deaths}{numeric. The reported number of Covid-19 deaths.}
 }
 }
 \source{
@@ -23,35 +26,46 @@ Tibble with seven columns
 data(covid19)
 }
 \description{
-Reported COVID-19 infections, and deaths, collected and collated by the European Centre for Disease Prevention
-and Control (ECDC, provided by day and country.
-Data were collated and published up to 14th December 2020, and have been tidied so they are easily usable within the `tidyverse` of packages.
+Reported COVID-19 infections, and deaths, collected and collated by the
+European Centre for Disease Prevention and Control (ECDC, provided by day
+and country.
+Data were collated and published up to 14th December 2020, and have been
+tidied so they are easily usable with the 'tidyverse'.
 }
 \details{
-Data sourced from \href{https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide}{European Centre for Disease Prevention and Control}
-which is available under the open licence, compatible with the  CC BY 4.0 license, further details available at \href{https://www.ecdc.europa.eu/en/copyright}{ECDC}.
+Data sourced from \href{https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide}{European Centre for Disease Prevention and Control},
+which is available under the open licence, compatible with the CC-BY-4.0
+license. Further details available at the 
+\href{https://www.ecdc.europa.eu/en/copyright}{ECDC website}.
 }
 \examples{
 data(covid19)
 
-library(dplyr)
-library(ggplot2)
-library(scales)
+countries <- c("France", "Germany", "Italy", "Spain", "United Kingdom")
 
-# Create a plot of the performance for England over time
-covid19 \%>\%
-  filter(countries_and_territories ==
-  c( "United_Kingdom", "Italy", "France", "Germany", "Spain")) \%>\%
-  ggplot(aes(x=date_reported, y= cases, col=countries_and_territories)) +
-  geom_line()+
-  scale_color_discrete("Country") +
-  scale_y_continuous(labels=comma)+
-  labs(y="Cases", x="Date", title="Covid-19 cases for selected countries"
-       , alt="A plot of covid-19 cases in France, Germany, Italy, Spain & the UK")+
-  theme_minimal()
+# Create a plot of the performance for selected countries over time
+ covid19 |>
+   dplyr::filter(if_any("country_territory", \(x) x \%in\% countries)) |>
+   ggplot2::ggplot(
+   ggplot2::aes(
+     x = date_reported,
+     y = cases
+   )) +
+   ggplot2::geom_line(ggplot2::aes(colour = country_territory)) +
+   ggplot2::scale_colour_discrete("Country") +
+   ggplot2::scale_y_continuous(labels = scales::comma) +
+   ggplot2::labs(
+     title = "Covid-19 cases for selected countries",
+     x = "Date",
+     y = "Cases",
+     alt = "Covid-19 cases (2020) in France, Germany, Italy, Spain & the UK"
+   ) +
+   ggplot2::theme_minimal()
 }
 \keyword{coronavirus}
-\keyword{countries}
 \keyword{covid}
+\keyword{covid19}
 \keyword{datasets}
 \keyword{deaths}
+\keyword{ecdc}
+\keyword{epidemiology}
